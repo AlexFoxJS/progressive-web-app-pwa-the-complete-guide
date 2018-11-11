@@ -19,14 +19,29 @@ window.addEventListener('beforeinstallprompt', event => {
 // Promise
 var promice = new Promise((resolve, reject) => {
 	setTimeout(() => {
-		resolve('This is executed once the timer is done!')
+		// resolve('This is executed once the timer is done!');
+		reject({
+			code: 500,
+			message: 'An error occurred!'
+		})
 	}, 3000)
 });
 
+// promice
+// 	.then(
+// 		text => text,
+// 		error => {
+// 			console.log(error.code, error.message);
+// 		}
+// 	)
+// 	.then(newText => {
+// 		console.log('newText', newText)
+// 	});
+
+
 promice
 	.then(text => text)
-	.then(newText => {
-		console.log(newText)
-	});
+	.then(newText => {console.log(newText)})
+	.catch(err => {console.log(err.code, err.message)});
 
 console.log('This is executed right after setTimeout()');
