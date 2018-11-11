@@ -30,6 +30,19 @@ var promice = new Promise((resolve, reject) => {
 	}, 3000)
 });
 
+fetch('http://httpbin.org/ip')
+	.then(response => {
+		console.log(response);
+		return response.json();
+	})
+	.then(data => {
+		console.log(data);
+	})
+	.catch(err => {
+		console.log(err);
+	});
+
+
 // promice
 // 	.then(
 // 		text => text,
@@ -40,7 +53,6 @@ var promice = new Promise((resolve, reject) => {
 // 	.then(newText => {
 // 		console.log('newText', newText)
 // 	});
-
 
 promice
 	.then(text => text)
