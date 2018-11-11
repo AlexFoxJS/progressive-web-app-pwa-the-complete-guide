@@ -1,4 +1,4 @@
-
+//
 if ('serviceWorker' in navigator) {
 	navigator.serviceWorker
 		.register('/sw.js')
@@ -6,3 +6,27 @@ if ('serviceWorker' in navigator) {
 			console.log('Service Worker registered!')
 		})
 }
+
+//
+var deferentPrompt;
+window.addEventListener('beforeinstallprompt', event => {
+	console.log('beforeinstallprompt fired');
+	event.preventDefault();
+	deferentPrompt = event;
+	return false;
+});
+
+// Promise
+var promice = new Promise((resolve, reject) => {
+	setTimeout(() => {
+		resolve('This is executed once the timer is done!')
+	}, 3000)
+});
+
+promice
+	.then(text => text)
+	.then(newText => {
+		console.log(newText)
+	});
+
+console.log('This is executed right after setTimeout()');
