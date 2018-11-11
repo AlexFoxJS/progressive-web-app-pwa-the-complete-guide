@@ -5,6 +5,9 @@ if ('serviceWorker' in navigator) {
 		.then(() => {
 			console.log('Service Worker registered!')
 		})
+		.catch(err => {
+			console.log(err)
+		})
 }
 
 //
@@ -41,7 +44,11 @@ var promice = new Promise((resolve, reject) => {
 
 promice
 	.then(text => text)
-	.then(newText => {console.log(newText)})
-	.catch(err => {console.log(err.code, err.message)});
+	.then(newText => {
+		console.log(newText)
+	})
+	.catch(err => {
+		console.log(err.code, err.message)
+	});
 
 console.log('This is executed right after setTimeout()');
