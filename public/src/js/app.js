@@ -53,6 +53,7 @@ fetch(
 			"Content-Type": "application/json",
 			"Accept": "application/json"
 		},
+		mode: "cors",
 		body: JSON.stringify({
 			message: "Does it work?"
 		})
