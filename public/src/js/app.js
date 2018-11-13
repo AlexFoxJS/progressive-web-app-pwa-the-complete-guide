@@ -11,7 +11,7 @@ if ('serviceWorker' in navigator) {
 }
 
 //
-var deferentPrompt;
+let deferentPrompt;
 window.addEventListener('beforeinstallprompt', event => {
 	console.log('beforeinstallprompt fired');
 	event.preventDefault();
@@ -20,7 +20,7 @@ window.addEventListener('beforeinstallprompt', event => {
 });
 
 // Promise
-var promice = new Promise((resolve, reject) => {
+const promice = new Promise((resolve, reject) => {
 	setTimeout(() => {
 		// resolve('This is executed once the timer is done!');
 		reject({
@@ -31,17 +31,31 @@ var promice = new Promise((resolve, reject) => {
 });
 
 // TESTS API - START
+// FETCH (AJAX)
+const xhr = new XMLHttpRequest();
+xhr.open('GET', 'http://httpbin.org/ip');
+xhr.responseType = 'json';
+
+xhr.onload = () => {
+	console.log('AJAX_1_0', xhr.response)
+};
+xhr.onerror = () => {
+	console.log('AJAX_1_1', 'error!')
+};
+
+xhr.send();
+
 // FETCH
 fetch('http://httpbin.org/ip')
 	.then(response => {
-		console.log(response);
+		console.log('FETCH_1_0', response);
 		return response.json();
 	})
 	.then(data => {
-		console.log(data);
+		console.log('FETCH_1_1', data);
 	})
 	.catch(err => {
-		console.log(err);
+		console.log('FETCH_1_2', err);
 	});
 
 // POST
@@ -60,14 +74,14 @@ fetch(
 	}
 )
 	.then(response => {
-		console.log(response);
+		console.log('POST_1_0', response);
 		return response.json();
 	})
 	.then(data => {
-		console.log(data);
+		console.log('POST_1_1', data);
 	})
 	.catch(err => {
-		console.log(err);
+		console.log('POST_1_2', err);
 	});
 // TESTS API - END
 
