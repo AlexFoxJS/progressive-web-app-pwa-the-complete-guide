@@ -30,6 +30,8 @@ var promice = new Promise((resolve, reject) => {
 	}, 3000)
 });
 
+// TESTS API - START
+// FETCH
 fetch('http://httpbin.org/ip')
 	.then(response => {
 		console.log(response);
@@ -41,6 +43,32 @@ fetch('http://httpbin.org/ip')
 	.catch(err => {
 		console.log(err);
 	});
+
+// POST
+fetch(
+	'http://httpbin.org/post',
+	{
+		method: 'POST',
+		headers: {
+			"Content-Type": "application/json",
+			"Accept": "application/json"
+		},
+		body: JSON.stringify({
+			message: "Does it work?"
+		})
+	}
+)
+	.then(response => {
+		console.log(response);
+		return response.json();
+	})
+	.then(data => {
+		console.log(data);
+	})
+	.catch(err => {
+		console.log(err);
+	});
+// TESTS API - END
 
 
 // promice
