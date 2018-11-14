@@ -6,23 +6,23 @@ const sharedMomentsArea = document.querySelector('#shared-moments');
 openCreatePostModal = () => {
 	createPostArea.style.display = 'block';
 
-  if (deferentPrompt) {
+	if (deferentPrompt) {
 
-  	deferentPrompt.prompt();
+		deferentPrompt.prompt();
 
-  	deferentPrompt.userChoice.then(choiceResult => {
-		  console.log(choiceResult.outcome);
+		deferentPrompt.userChoice.then(choiceResult => {
+			console.log(choiceResult.outcome);
 
-		  if (choiceResult.outcome === 'dismissed') {
-			  console.log('User canceled instalation');
-		  } else {
-			  console.log('User added to home screen');
-		  }
+			if (choiceResult.outcome === 'dismissed') {
+				console.log('User canceled instalation');
+			} else {
+				console.log('User added to home screen');
+			}
 
-	  });
+		});
 
-  	deferentPrompt = null;
-  }
+		deferentPrompt = null;
+	}
 
 };
 
@@ -40,7 +40,7 @@ createCard = () => {
 	const cardTitleTextElement = document.createElement('h2');
 	const cardSupportingText = document.createElement('div');
 
-	cardWrapper.className = 'shared-moment-card mdl-card mdl-shadow--2dp';
+	cardWrapper.className = 'shared-moment-card mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col';
 
 	cardTitle.className = 'mdl-card__title';
 	cardTitle.style.backgroundImage = 'url("/src/images/sf-boat.jpg")';
@@ -62,9 +62,7 @@ createCard = () => {
 };
 
 fetch('https://httpbin.org/get')
-	.then(function(res) {
-		return res.json();
-	})
-	.then(function(data) {
+	.then(res => res.json())
+	.then(data => {
 		createCard();
 	});
