@@ -23,5 +23,10 @@ self.addEventListener('activate', event => {
 // https://developer.mozilla.org/en-US/docs/Web/API/FetchEvent
 self.addEventListener('fetch', event => {
 	// console.log('[Service Worker] Fetching something ...', event);
-	event.respondWith(fetch(event.request));
+	// event.respondWith(fetch(event.request));
+
+	event.respondWith(
+		caches.match(event.request)
+			.then(responce => responce ? responce : fetch(event.request))
+	);
 });
