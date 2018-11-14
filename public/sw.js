@@ -1,6 +1,17 @@
 // https://developer.mozilla.org/en-US/docs/Web/API/InstallEvent
 self.addEventListener('install', event => {
-	console.log('[Service Worker] Install Service Worker ...', event)
+	console.log('[Service Worker] Install Service Worker ...', event);
+
+	event.waitUntil(
+		caches.open('precache')
+			.then(cache => {
+				console.log('[Service Worker] Precaching App Shell');
+				cache.add('/src/js/app.js')
+			})
+			.catch(e => {
+				console.error(e)
+			})
+	);
 });
 
 // https://developer.mozilla.org/en-US/docs/Web/Events/activate
