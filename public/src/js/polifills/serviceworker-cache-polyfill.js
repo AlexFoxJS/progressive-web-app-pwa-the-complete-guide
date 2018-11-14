@@ -15,25 +15,13 @@
  *
  */
 
-(function() {
-	var nativeAddAll = Cache.prototype.addAll;
-	var userAgent = navigator.userAgent.match(/(Firefox|Chrome)\/(\d+\.)/);
+if (!Cache.prototype.add) {
+	Cache.prototype.add = function add(request) {
+		return this.addAll([request]);
+	};
+}
 
-	// Has nice behavior of `var` which everyone hates
-	if (userAgent) {
-		var agent = userAgent[1];
-		var version = parseInt(userAgent[2]);
-	}
-
-	if (
-		nativeAddAll && (!userAgent ||
-			(agent === 'Firefox' && version >= 46) ||
-			(agent === 'Chrome'  && version >= 50)
-		)
-	) {
-		return;
-	}
-
+if (!Cache.prototype.addAll) {
 	Cache.prototype.addAll = function addAll(requests) {
 		var cache = this;
 
@@ -43,7 +31,6 @@
 			this.code = 19;
 			this.message = message;
 		}
-
 		NetworkError.prototype = Object.create(Error.prototype);
 
 		return Promise.resolve().then(function() {
@@ -77,14 +64,6 @@
 				})
 			);
 		}).then(function(responses) {
-			// If some of the responses has not OK-eish status,
-			// then whole operation should reject
-			if (responses.some(function(response) {
-				return !response.ok;
-			})) {
-				throw new NetworkError('Incorrect response status');
-			}
-
 			// TODO: check that requests don't overwrite one another
 			// (don't think this is possible to polyfill due to opaque responses)
 			return Promise.all(
@@ -96,8 +75,4 @@
 			return undefined;
 		});
 	};
-
-	Cache.prototype.add = function add(request) {
-		return this.addAll([request]);
-	};
-}());
+}
