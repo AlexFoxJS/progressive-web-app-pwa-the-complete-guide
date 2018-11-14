@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>040 Service Worker FAQ</title>
+</head>
+<body>
+<div class="asset-container">
+    <div class="asset-container__padding article-view">
+        <div class="w3c-default">
+            <p><strong>Is the Service Worker installed everytime I refresh the page?<br></strong></p>
+
+<p>No, whilst the browser does of course (naturally) execute the <code>register()</code>  code everytime you refresh the page, it won't install the service worker if the service worker file hasn't changed. If it only changed by 1 byte though, it'll install it as a new service worker (but wait with the activation as explained).</p>
+
+
+
+<p><strong>Can I unregister a Service Worker?</strong></p>
+
+
+
+<p>Yes, this is possible, the following code does the trick:</p>
+
+
+
+
+
+<pre class="prettyprint linenums">navigator.serviceWorker.getRegistrations().then(function(registrations) {
+ for(let registration of registrations) {
+  registration.unregister()
+} })
+</pre>
+
+
+
+
+
+
+
+
+
+<p><strong>My app behaves strangely/ A new Service Worker isn't getting installed.</strong></p>
+
+
+
+
+
+<p>It probably gets installed but you still have some tab/ window with your app open (in one and the same browser). New service workers don't <strong>activate</strong> before all tabs/ windows with your app running in it are closed. Make sure to do that and then try again.</p>
+
+
+
+
+
+<p><strong>Can I have multiple 'fetch' listeners in a service worker?</strong></p>
+
+
+
+
+
+<p>Yes, this is possible.</p>
+
+
+
+
+
+<p><strong>Can I have multiple service workers on a page?</strong></p>
+
+
+
+
+
+<p>Yes, but only with <strong>different scopes</strong>. You can use a service worker for the /help "subdirectory" and one for the rest of your app. The more specific service worker (=&gt; /help) overwrites the other one for its scope.</p>
+
+
+
+
+
+<p><strong>Can Service Workers communicate with my Page/ the "normal" JavaScript code there?</strong></p>
+
+
+
+
+
+<p>Yes, that's possible using messages. Have a look at the following thread for more infos: <a href="http://craig-russell.co.uk/2016/01/29/service-worker-messaging.html#.WagROdMjF7M" rel="nofollow">http://craig-russell.co.uk/2016/01/29/service-worker-messaging.html#.WagROdMjF7M</a></p>
+
+
+
+
+
+<p>This is actually not Service Worker specific, it applies to all Web Workers.</p>
+
+
+
+
+
+<p><strong>What's the difference between Web Workers and Service Workers?</strong></p>
+
+
+
+
+
+<p>Service Workers are a special type of Web Workers. Web Workers also run on a background thread, decoupled from the DOM. They don't keep on living after the page is closed though. The Service Worker on the other hand, keeps on running (depending on the operating system) and also is decoupled from an individual page. </p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

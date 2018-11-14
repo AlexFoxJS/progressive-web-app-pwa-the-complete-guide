@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>087 Making Route Matching More Precise</title>
+</head>
+<body>
+<div class="asset-container">
+    <div class="asset-container__padding article-view">
+        <div class="w3c-default">
+            <p>The current implementation of the "cache only" URL checking has a flaw. We just implemented the following logic:</p>
+
+<pre class="prettyprint linenums">function isInArray(string, array) {
+  for (var i = 0; i &lt; array.length; i++) {
+    if (array[i] === string) {
+      return true;
+    }
+  }
+  return false;
+}</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<p>This will work fine for full URLs stored in <code>STATIC_FILES</code>  (e.g. the CDN links) but it'll fail for <code>/</code> , <code>/index.html</code>  etc.</p>
+
+
+
+
+
+
+
+<p>That's not an issue because our final else block picks these URLs up and matches them.</p>
+
+
+
+
+
+
+
+<p>An improvement of the <code>isInArray</code>  method can be found here:</p>
+
+
+
+
+
+
+
+<pre class="prettyprint linenums">function isInArray(string, array) {
+  var cachePath;
+  if (string.indexOf(self.origin) === 0) { // request targets domain where we serve the page from (i.e. NOT a CDN)
+    console.log('matched ', string);
+    cachePath = string.substring(self.origin.length); // take the part of the URL AFTER the domain (e.g. after localhost:8080)
+  } else {
+    cachePath = string; // store the full request (for CDNs)
+  }
+  return array.indexOf(cachePath) &gt; -1;
+}</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<p>Later in the course, we'll implement a better matching method anyways (using a third-party tool: Workbox) but feel free to implement this fix right now.</p>
+
+<p>Max</p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
