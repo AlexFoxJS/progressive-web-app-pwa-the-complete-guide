@@ -38,6 +38,9 @@ self.addEventListener('install', event => {
 // https://developer.mozilla.org/en-US/docs/Web/Events/activate
 self.addEventListener('activate', event => {
 	console.log('[Service Worker] Activating Service Worker ...', event);
+
+	event.
+
 	return self.clients.claim()
 });
 
