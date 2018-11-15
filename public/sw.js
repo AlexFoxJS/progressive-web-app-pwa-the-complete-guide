@@ -85,9 +85,23 @@ self.addEventListener('activate', event => {
 // });
 
 // 72 Strategy Network Only
-// https://developer.mozilla.org/en-US/docs/Web/API/FetchEvent
+// // https://developer.mozilla.org/en-US/docs/Web/API/FetchEvent
 // self.addEventListener('fetch', event => {
 // 	event.respondWith(
 // 		fetch(event.request)
 // 	)
 // });
+
+// 73 Strategy Network with Cache Fallback
+// https://developer.mozilla.org/en-US/docs/Web/API/FetchEvent
+self.addEventListener('fetch', event => {
+	event.respondWith(
+		fetch(event.request)
+			.then(res => caches.open(CACHE_DYNAMIC_NAME)
+				.then(cache => {
+					cache.put(event.request.url, res.clone());
+					return res;
+				}))
+			.catch(err => caches.match(event.request))
+	)
+});
