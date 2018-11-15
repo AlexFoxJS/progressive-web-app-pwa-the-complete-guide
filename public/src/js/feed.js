@@ -50,6 +50,7 @@ createCard = () => {
 
 	cardTitleTextElement.className = 'mdl-card__title-text';
 	cardTitleTextElement.textContent = 'San Francisco Trip';
+	cardTitleTextElement.style.color = 'white';
 	cardTitle.appendChild(cardTitleTextElement);
 
 	cardSupportingText.className = 'mdl-card__supporting-text';
