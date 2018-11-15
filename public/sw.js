@@ -86,8 +86,8 @@ self.addEventListener('activate', event => {
 
 // 72 Strategy Network Only
 // https://developer.mozilla.org/en-US/docs/Web/API/FetchEvent
-self.addEventListener('fetch', event => {
-	event.respondWith(
-		fetch(event.request)
-	)
-});
+// self.addEventListener('fetch', event => {
+// 	event.respondWith(
+// 		fetch(event.request)
+// 	)
+// });
