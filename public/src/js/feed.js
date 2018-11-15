@@ -1,8 +1,13 @@
+//
+const CAHCE_USER_REQUESTED_NAME = 'user-requested';
+
+//
 const shareImageButton = document.querySelector('#share-image-button');
 const createPostArea = document.querySelector('#create-post');
 const closeCreatePostModalButton = document.querySelector('#close-create-post-modal-btn');
 const sharedMomentsArea = document.querySelector('#shared-moments');
 
+//
 openCreatePostModal = () => {
 	createPostArea.style.display = 'block';
 
@@ -25,19 +30,26 @@ openCreatePostModal = () => {
 	}
 
 };
+shareImageButton.addEventListener('click', openCreatePostModal);
 
+//
 closeCreatePostModal = () => {
 	createPostArea.style.display = 'none';
 };
-
-shareImageButton.addEventListener('click', openCreatePostModal);
-
 closeCreatePostModalButton.addEventListener('click', closeCreatePostModal);
 
+// Currently not in use, allows to save a assets in cache on demand otherwise
 onSaveButtonClicked = event => {
 	console.log('onSaveButtonClicked', event);
+
+	caches.open(CAHCE_USER_REQUESTED_NAME)
+		.then(cache => {
+			cache.add('https://httpbin.org/get');
+			cache.add('/src/images/sf-boat.jpg')
+		})
 };
 
+//
 createCard = () => {
 	const cardWrapper = document.createElement('div');
 	const cardTitle = document.createElement('div');
@@ -61,9 +73,12 @@ createCard = () => {
 	cardSupportingText.className = 'mdl-card__supporting-text';
 	cardSupportingText.textContent = 'In San Francisco';
 	cardSupportingText.style.textAlign = 'center';
-	cardSaveButton.className = 'mdl-button mdl-js-button mdl-button--primary';
-	cardSaveButton.textContent = 'Save';
-	cardSaveButton.addEventListener('click', onSaveButtonClicked);
+
+	// 68 Offering Cache on Demand
+	// cardSaveButton.className = 'mdl-button mdl-js-button mdl-button--primary';
+	// cardSaveButton.textContent = 'Save';
+	// cardSaveButton.addEventListener('click', onSaveButtonClicked);
+
 	cardSupportingText.appendChild(cardSaveButton);
 	cardWrapper.appendChild(cardSupportingText);
 
@@ -71,6 +86,7 @@ createCard = () => {
 	sharedMomentsArea.appendChild(cardWrapper);
 };
 
+//
 fetch('https://httpbin.org/get')
 	.then(res => res.json())
 	.then(data => {
