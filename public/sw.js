@@ -45,20 +45,13 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
 	event.respondWith(
 		caches.match(event.request)
-			.then(res_1 => {
-
-				if (res_1) return res_1;
-				else return fetch(event.request)
-					.then(res_2 => {
-
-						return caches.open('dynamic')
-							.then(cache => {
-								cache.put(event.request.url, res_2.clone());
-								return res_2;
-							})
-
+			.then(res_1 => res_1 ? res_1 : fetch(event.request)
+				.then(res_2 => caches.open('dynamic')
+					.then(cache => {
+						cache.put(event.request.url, res_2.clone());
+						return res_2;
 					})
-
-			})
+				)
+			)
 	)
 });
