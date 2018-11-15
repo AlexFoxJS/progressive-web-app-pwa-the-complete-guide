@@ -52,6 +52,9 @@ self.addEventListener('fetch', event => {
 						return res_2;
 					})
 				)
+				.catch(err => {
+					console.error(err);
+				})
 			)
 	)
 });
