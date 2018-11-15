@@ -4,12 +4,16 @@ const CAHCE_USER_REQUESTED_NAME = 'user-requested';
 //
 const MOCK_URL_GET_HTTPBIN = 'https://httpbin.org/get';
 
-
 //
 const shareImageButton = document.querySelector('#share-image-button');
 const createPostArea = document.querySelector('#create-post');
 const closeCreatePostModalButton = document.querySelector('#close-create-post-modal-btn');
 const sharedMomentsArea = document.querySelector('#shared-moments');
+
+//
+let networkDataRecived = false;
+
+
 
 //
 openCreatePostModal = () => {
@@ -50,8 +54,14 @@ onSaveButtonClicked = event => {
 		caches.open(CAHCE_USER_REQUESTED_NAME)
 			.then(cache => {
 				cache.add(MOCK_URL_GET_HTTPBIN);
-				cache.add('/src/images/sf-boat.jpg')
+				cache.add('/src/images/sf-boat.jpg');
 			})
+	}
+};
+
+clearCards = () => {
+	while (sharedMomentsArea.hasChildNodes()) {
+		sharedMomentsArea.removeChild(sharedMomentsArea.lastChild);
 	}
 };
 
@@ -61,7 +71,6 @@ createCard = () => {
 	const cardTitle = document.createElement('div');
 	const cardTitleTextElement = document.createElement('h2');
 	const cardSupportingText = document.createElement('div');
-	const cardSaveButton = document.createElement('button');
 
 	cardWrapper.className = 'shared-moment-card mdl-card mdl-shadow--2dp mdl-cell';
 
@@ -81,6 +90,7 @@ createCard = () => {
 	cardSupportingText.style.textAlign = 'center';
 
 	// 68 Offering Cache on Demand
+	// const cardSaveButton = document.createElement('button');
 	// cardSaveButton.className = 'mdl-button mdl-js-button mdl-button--primary';
 	// cardSaveButton.textContent = 'Save';
 	// cardSaveButton.addEventListener('click', onSaveButtonClicked);
@@ -97,15 +107,22 @@ fetch(MOCK_URL_GET_HTTPBIN)
 	.then(res => res.json())
 	.then(data => {
 		console.log('From web:', data);
+
+		networkDataRecived = true;
+		clearCards();
 		createCard();
 	});
 
 //
 if ('caches' in window) {
 	caches.match(MOCK_URL_GET_HTTPBIN)
-		.then(res => res ? res : false)
+		.then(res => res && res.json())
 		.then(data => {
 			console.log('From cache:', data);
-			createCard()
+
+			if (!networkDataRecived) {
+				clearCards();
+				createCard();
+			}
 		})
 }
