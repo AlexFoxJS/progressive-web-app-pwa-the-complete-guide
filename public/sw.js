@@ -5,7 +5,7 @@ self.addEventListener('install', event => {
 	console.log('[Service Worker] Install Service Worker ...', event);
 
 	event.waitUntil(
-		caches.open('precache')
+		caches.open('static')
 			.then(cache => {
 				console.log('[Service Worker] Precaching App Shell');
 				cache.addAll([
@@ -45,6 +45,20 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
 	event.respondWith(
 		caches.match(event.request)
-			.then(response => response ? response : fetch(event.request))
-	);
+			.then(res_1 => {
+
+				if (res_1) return res_1;
+				else return fetch(event.request)
+					.then(res_2 => {
+
+						return caches.open('dynamic')
+							.then(cache => {
+								cache.put(event.request.url, res_2.clone());
+								return res_2;
+							})
+
+					})
+
+			})
+	)
 });
