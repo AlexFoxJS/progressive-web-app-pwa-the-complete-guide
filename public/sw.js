@@ -1,30 +1,22 @@
-importScripts('/src/js/polifills/serviceworker-cache-polyfill.js');
-
 const CACHE_STATIC_NAME = 'static-v1';
 const CACHE_DYNAMIC_NAME = 'dynamic-v1';
 const CACHE_STATIC_FILES_LIST = [
 	'/',
 	'/index.html',
 	'/offline.html',
-
 	'/src/js/app.js',
 	'/src/js/feed.js',
-	'/src/js/polifills/promise.js',
-	'/src/js/polifills/fetch.js',
-	'/src/js/polifills/serviceworker-cache-polyfill.js',
+	'/src/js/polyfill/promise.js',
+	'/src/js/polyfill/fetch.js',
 	'/src/js/material.min.js',
-
 	'/src/css/app.css',
 	'/src/css/feed.css',
-
 	'/src/images/main-image.jpg',
-
 	'https://fonts.googleapis.com/css?family=Roboto:400,700',
 	'https://fonts.googleapis.com/icon?family=Material+Icons',
 	'https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.indigo-pink.min.css'
 ];
 
-// https://developer.mozilla.org/en-US/docs/Web/API/InstallEvent
 self.addEventListener('install', event => {
 	console.log('[Service Worker] Install Service Worker ...', event);
 
@@ -40,7 +32,6 @@ self.addEventListener('install', event => {
 	);
 });
 
-// https://developer.mozilla.org/en-US/docs/Web/Events/activate
 self.addEventListener('activate', event => {
 	console.log('[Service Worker] Activating Service Worker ...', event);
 
@@ -54,12 +45,11 @@ self.addEventListener('activate', event => {
 			})))
 	);
 
-	return self.clients.claim()
+	return self.clients.claim();
 });
 
 // Different's CACHE strategy START
 // 70 Strategy Cache with Network Fallback
-// // https://developer.mozilla.org/en-US/docs/Web/API/FetchEvent
 // self.addEventListener('fetch', event => {
 // 	event.respondWith(
 // 		caches.match(event.request)
@@ -105,35 +95,92 @@ self.addEventListener('activate', event => {
 // });
 
 
+isInArray = (string, array) => {
+	let cachePath;
+
+	if (string.indexOf(self.origin) === 0) {
+		console.log('matched ', string);
+		cachePath = string.substring(self.origin.length);
+	} else {
+		cachePath = string;
+	}
+
+	return array.indexOf(cachePath) > -1;
+};
+
 // 75 Cache then Network  Dynamic Caching
 self.addEventListener('fetch', event => {
 	const MOCK_URL_GET_HTTPBIN = 'https://httpbin.org/get';
+
+	// TODO: Разобраться почему не работает
+	// START
+	// if (event.request.url.indexOf(MOCK_URL_GET_HTTPBIN) > -1) {
+	// 	event.respondWith(
+	// 		caches.open(CACHE_DYNAMIC_NAME)
+	// 			.then(cache => fetch(event.request)
+	// 				.then(res => {
+	// 					cache.put(event.request, res.clone());
+	// 					return res
+	// 				})
+	// 			)
+	// 	)
+	// } else if (new RegExp('\\b' + CACHE_STATIC_FILES_LIST.join('\\b|\\b') + '\\b').test(event.request.url)) {
+	// 	event.respondWith(
+	// 		caches.match(event.request)
+	// 	)
+	// } else {
+	// 	event.respondWith(
+	// 		caches.match(event.request)
+	// 			.then(res_1 => res_1 ? res_1 : fetch(event.request)
+	// 				.then(res_2 => caches.open(CACHE_DYNAMIC_NAME)
+	// 					.then(cache => {
+	// 						cache.put(event.request.url, res_2.clone());
+	// 						return res_2;
+	// 					})
+	// 				)
+	// 				.catch(err => caches.open(CACHE_STATIC_NAME)
+	// 					.then(cache => event.request.url.indexOf('/help') && cache.match('/offline.html'))
+	// 				)
+	// 			)
+	// 	)
+	// }
+	// END
 
 	if (event.request.url.indexOf(MOCK_URL_GET_HTTPBIN) > -1) {
 		event.respondWith(
 			caches.open(CACHE_DYNAMIC_NAME)
 				.then(cache => fetch(event.request)
 					.then(res => {
+						// trimCache(CACHE_DYNAMIC_NAME, 3);
 						cache.put(event.request, res.clone());
-						return res
+						return res;
 					})
 				)
-		)
+		);
+	} else if (isInArray(event.request.url, CACHE_STATIC_FILES_LIST)) {
+		event.respondWith(
+			caches.match(event.request)
+		);
 	} else {
 		event.respondWith(
 			caches.match(event.request)
 				.then(res_1 => res_1 ? res_1 : fetch(event.request)
 					.then(res_2 => caches.open(CACHE_DYNAMIC_NAME)
 						.then(cache => {
+							// trimCache(CACHE_DYNAMIC_NAME, 3);
 							cache.put(event.request.url, res_2.clone());
 							return res_2;
 						})
 					)
 					.catch(err => caches.open(CACHE_STATIC_NAME)
-						.then(cache => event.request.url.indexOf('/help') && cache.match('/offline.html'))
+						.then(cache => {
+							if (event.request.headers.get('accept').includes('text/html')) {
+								return cache.match('/offline.html');
+							}
+						})
 					)
 				)
-		)
+		);
 	}
 });
 // Different's CACHE strategy END
