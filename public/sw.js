@@ -130,7 +130,7 @@ self.addEventListener('fetch', event => {
 						})
 					)
 					.catch(err => caches.open(CACHE_STATIC_NAME)
-						.then(cache => cache.match('/offline.html'))
+						.then(cache => event.request.url.indexOf('/help') && cache.match('/offline.html'))
 					)
 				)
 		)
