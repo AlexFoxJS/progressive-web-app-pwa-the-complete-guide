@@ -107,14 +107,33 @@ self.addEventListener('activate', event => {
 
 // 75 Cache then Network  Dynamic Caching
 self.addEventListener('fetch', event => {
-	event.respondWith(
-		caches.open(CACHE_DYNAMIC_NAME)
-			.then(cache => fetch(event.request)
-				.then(res => {
-					cache.put(event.request, res.clone());
-					return res
-				})
-			)
-	)
+	const MOCK_URL_GET_HTTPBIN = 'https://httpbin.org/get';
+
+	if (event.request.url.indexOf(MOCK_URL_GET_HTTPBIN) > -1) {
+		event.respondWith(
+			caches.open(CACHE_DYNAMIC_NAME)
+				.then(cache => fetch(event.request)
+					.then(res => {
+						cache.put(event.request, res.clone());
+						return res
+					})
+				)
+		)
+	} else {
+		event.respondWith(
+			caches.match(event.request)
+				.then(res_1 => res_1 ? res_1 : fetch(event.request)
+					.then(res_2 => caches.open(CACHE_DYNAMIC_NAME)
+						.then(cache => {
+							cache.put(event.request.url, res_2.clone());
+							return res_2;
+						})
+					)
+					.catch(err => caches.open(CACHE_STATIC_NAME)
+						.then(cache => cache.match('/offline.html'))
+					)
+				)
+		)
+	}
 });
 // Different's CACHE strategy END
