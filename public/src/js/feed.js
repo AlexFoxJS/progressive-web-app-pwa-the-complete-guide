@@ -2,6 +2,10 @@
 const CAHCE_USER_REQUESTED_NAME = 'user-requested';
 
 //
+const MOCK_URL_GET_HTTPBIN = 'https://httpbin.org/get';
+
+
+//
 const shareImageButton = document.querySelector('#share-image-button');
 const createPostArea = document.querySelector('#create-post');
 const closeCreatePostModalButton = document.querySelector('#close-create-post-modal-btn');
@@ -45,7 +49,7 @@ onSaveButtonClicked = event => {
 	if ('caches' in window) {
 		caches.open(CAHCE_USER_REQUESTED_NAME)
 			.then(cache => {
-				cache.add('https://httpbin.org/get');
+				cache.add(MOCK_URL_GET_HTTPBIN);
 				cache.add('/src/images/sf-boat.jpg')
 			})
 	}
@@ -89,8 +93,19 @@ createCard = () => {
 };
 
 //
-fetch('https://httpbin.org/get')
+fetch(MOCK_URL_GET_HTTPBIN)
 	.then(res => res.json())
 	.then(data => {
+		console.log('From web:', data);
 		createCard();
 	});
+
+//
+if ('caches' in window) {
+	caches.match(MOCK_URL_GET_HTTPBIN)
+		.then(res => res ? res : false)
+		.then(data => {
+			console.log('From cache:', data);
+			createCard()
+		})
+}
