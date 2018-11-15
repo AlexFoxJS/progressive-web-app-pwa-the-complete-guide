@@ -57,20 +57,29 @@ self.addEventListener('activate', event => {
 	return self.clients.claim()
 });
 
+// 70 Strategy Cache with Network Fallback
+// // https://developer.mozilla.org/en-US/docs/Web/API/FetchEvent
+// self.addEventListener('fetch', event => {
+// 	event.respondWith(
+// 		caches.match(event.request)
+// 			.then(res_1 => res_1 ? res_1 : fetch(event.request)
+// 				.then(res_2 => caches.open(CACHE_DYNAMIC_NAME)
+// 					.then(cache => {
+// 						cache.put(event.request.url, res_2.clone());
+// 						return res_2;
+// 					})
+// 				)
+// 				.catch(err => caches.open(CACHE_STATIC_NAME)
+// 					.then(cache => cache.match('/offline.html'))
+// 				)
+// 			)
+// 	)
+// });
+
+// 71 Strategy Cache Only
 // https://developer.mozilla.org/en-US/docs/Web/API/FetchEvent
 self.addEventListener('fetch', event => {
 	event.respondWith(
 		caches.match(event.request)
-			.then(res_1 => res_1 ? res_1 : fetch(event.request)
-				.then(res_2 => caches.open(CACHE_DYNAMIC_NAME)
-					.then(cache => {
-						cache.put(event.request.url, res_2.clone());
-						return res_2;
-					})
-				)
-				.catch(err => caches.open(CACHE_STATIC_NAME)
-					.then(cache => cache.match('/offline.html'))
-				)
-			)
 	)
 });
