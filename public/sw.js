@@ -57,6 +57,7 @@ self.addEventListener('activate', event => {
 	return self.clients.claim()
 });
 
+// Different's CACHE strategy START
 // 70 Strategy Cache with Network Fallback
 // // https://developer.mozilla.org/en-US/docs/Web/API/FetchEvent
 // self.addEventListener('fetch', event => {
@@ -77,7 +78,6 @@ self.addEventListener('activate', event => {
 // });
 
 // 71 Strategy Cache Only
-// // https://developer.mozilla.org/en-US/docs/Web/API/FetchEvent
 // self.addEventListener('fetch', event => {
 // 	event.respondWith(
 // 		caches.match(event.request)
@@ -85,7 +85,6 @@ self.addEventListener('activate', event => {
 // });
 
 // 72 Strategy Network Only
-// // https://developer.mozilla.org/en-US/docs/Web/API/FetchEvent
 // self.addEventListener('fetch', event => {
 // 	event.respondWith(
 // 		fetch(event.request)
@@ -93,15 +92,29 @@ self.addEventListener('activate', event => {
 // });
 
 // 73 Strategy Network with Cache Fallback
-// https://developer.mozilla.org/en-US/docs/Web/API/FetchEvent
+// self.addEventListener('fetch', event => {
+// 	event.respondWith(
+// 		fetch(event.request)
+// 			.then(res => caches.open(CACHE_DYNAMIC_NAME)
+// 				.then(cache => {
+// 					cache.put(event.request.url, res.clone());
+// 					return res;
+// 				}))
+// 			.catch(err => caches.match(event.request))
+// 	)
+// });
+
+
+// 75 Cache then Network  Dynamic Caching
 self.addEventListener('fetch', event => {
 	event.respondWith(
-		fetch(event.request)
-			.then(res => caches.open(CACHE_DYNAMIC_NAME)
-				.then(cache => {
-					cache.put(event.request.url, res.clone());
-					return res;
-				}))
-			.catch(err => caches.match(event.request))
+		caches.open(CACHE_DYNAMIC_NAME)
+			.then(cache => fetch(event.request)
+				.then(res => {
+					cache.put(event.request, res.clone());
+					return res
+				})
+			)
 	)
 });
+// Different's CACHE strategy END
