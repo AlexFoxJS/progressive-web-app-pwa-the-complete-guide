@@ -77,9 +77,17 @@ self.addEventListener('activate', event => {
 // });
 
 // 71 Strategy Cache Only
+// // https://developer.mozilla.org/en-US/docs/Web/API/FetchEvent
+// self.addEventListener('fetch', event => {
+// 	event.respondWith(
+// 		caches.match(event.request)
+// 	)
+// });
+
+// 72 Strategy Network Only
 // https://developer.mozilla.org/en-US/docs/Web/API/FetchEvent
 self.addEventListener('fetch', event => {
 	event.respondWith(
-		caches.match(event.request)
+		fetch(event.request)
 	)
 });
