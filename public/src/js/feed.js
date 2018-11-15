@@ -42,11 +42,13 @@ closeCreatePostModalButton.addEventListener('click', closeCreatePostModal);
 onSaveButtonClicked = event => {
 	console.log('onSaveButtonClicked', event);
 
-	caches.open(CAHCE_USER_REQUESTED_NAME)
-		.then(cache => {
-			cache.add('https://httpbin.org/get');
-			cache.add('/src/images/sf-boat.jpg')
-		})
+	if ('caches' in window) {
+		caches.open(CAHCE_USER_REQUESTED_NAME)
+			.then(cache => {
+				cache.add('https://httpbin.org/get');
+				cache.add('/src/images/sf-boat.jpg')
+			})
+	}
 };
 
 //
