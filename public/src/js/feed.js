@@ -2,7 +2,8 @@
 const CAHCE_USER_REQUESTED_NAME = 'user-requested';
 
 //
-const MOCK_URL_GET_HTTPBIN = 'https://httpbin.org/get';
+const MOCK_URL_GET = 'https://httpbin.org/get';
+const MOCK_URL_POST = 'https://httpbin.org/post';
 
 //
 const shareImageButton = document.querySelector('#share-image-button');
@@ -12,7 +13,6 @@ const sharedMomentsArea = document.querySelector('#shared-moments');
 
 //
 let networkDataRecived = false;
-
 
 
 //
@@ -53,7 +53,7 @@ onSaveButtonClicked = event => {
 	if ('caches' in window) {
 		caches.open(CAHCE_USER_REQUESTED_NAME)
 			.then(cache => {
-				cache.add(MOCK_URL_GET_HTTPBIN);
+				cache.add(MOCK_URL_GET);
 				cache.add('/src/images/sf-boat.jpg');
 			})
 	}
@@ -103,7 +103,16 @@ createCard = () => {
 };
 
 //
-fetch(MOCK_URL_GET_HTTPBIN)
+fetch(MOCK_URL_POST, {
+	method: 'POST',
+	headers: {
+		'Content-Type': 'application/json',
+		'Accept': 'application/json',
+	},
+	body: JSON.stringify({
+		message: 'POST API - Mock data'
+	})
+})
 	.then(res => res.json())
 	.then(data => {
 		console.log('From web:', data);
@@ -115,8 +124,10 @@ fetch(MOCK_URL_GET_HTTPBIN)
 
 //
 if ('caches' in window) {
-	caches.match(MOCK_URL_GET_HTTPBIN)
-		.then(res => res && res.json())
+	caches.match(MOCK_URL_GET)
+		.then(res => {
+			if (res) return res.json()
+		})
 		.then(data => {
 			console.log('From cache:', data);
 
