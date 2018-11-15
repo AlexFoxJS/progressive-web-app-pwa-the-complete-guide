@@ -1,10 +1,11 @@
 importScripts('/src/js/polifills/serviceworker-cache-polyfill.js');
 
-const CACHE_STATIC_NAME = 'static-v2';
-const CACHE_DYNAMIC_NAME = 'dynamic-v2';
+const CACHE_STATIC_NAME = 'static-v1';
+const CACHE_DYNAMIC_NAME = 'dynamic-v1';
 const CACHE_STATIC_FILES_LIST = [
 	'/',
 	'/index.html',
+	'/offline.html',
 
 	'/src/js/app.js',
 	'/src/js/feed.js',
@@ -63,13 +64,13 @@ self.addEventListener('fetch', event => {
 			.then(res_1 => res_1 ? res_1 : fetch(event.request)
 				.then(res_2 => caches.open(CACHE_DYNAMIC_NAME)
 					.then(cache => {
-						// cache.put(event.request.url, res_2.clone());
+						cache.put(event.request.url, res_2.clone());
 						return res_2;
 					})
 				)
-				.catch(err => {
-					console.error(err);
-				})
+				.catch(err => caches.open(CACHE_STATIC_NAME)
+					.then(cache => cache.match('/offline.html'))
+				)
 			)
 	)
 });
