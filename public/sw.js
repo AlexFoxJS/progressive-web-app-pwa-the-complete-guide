@@ -39,7 +39,15 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
 	console.log('[Service Worker] Activating Service Worker ...', event);
 
-	event.
+	event.waitUntil(
+		caches.keys()
+			.then(keyList => Promise.all(keyList.map(key => {
+				if (key !== 'static' && key !== 'dynamic') {
+					console.log('[Service Worker] Remove old cache ...', key);
+					return caches.delete(key);
+				}
+			})))
+	);
 
 	return self.clients.claim()
 });
