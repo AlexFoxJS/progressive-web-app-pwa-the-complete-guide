@@ -34,13 +34,18 @@ shareImageButton.addEventListener('click', openCreatePostModal);
 
 closeCreatePostModalButton.addEventListener('click', closeCreatePostModal);
 
+onSaveButtonClicked = event => {
+	console.log('onSaveButtonClicked', event);
+};
+
 createCard = () => {
 	const cardWrapper = document.createElement('div');
 	const cardTitle = document.createElement('div');
 	const cardTitleTextElement = document.createElement('h2');
 	const cardSupportingText = document.createElement('div');
+	const cardSaveButton = document.createElement('button');
 
-	cardWrapper.className = 'shared-moment-card mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col';
+	cardWrapper.className = 'shared-moment-card mdl-card mdl-shadow--2dp mdl-cell';
 
 	cardTitle.className = 'mdl-card__title';
 	cardTitle.style.backgroundImage = 'url("/src/images/sf-boat.jpg")';
@@ -56,6 +61,10 @@ createCard = () => {
 	cardSupportingText.className = 'mdl-card__supporting-text';
 	cardSupportingText.textContent = 'In San Francisco';
 	cardSupportingText.style.textAlign = 'center';
+	cardSaveButton.className = 'mdl-button mdl-js-button mdl-button--primary';
+	cardSaveButton.textContent = 'Save';
+	cardSaveButton.addEventListener('click', onSaveButtonClicked);
+	cardSupportingText.appendChild(cardSaveButton);
 	cardWrapper.appendChild(cardSupportingText);
 
 	componentHandler.upgradeElement(cardWrapper);

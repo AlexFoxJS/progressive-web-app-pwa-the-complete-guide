@@ -63,7 +63,7 @@ self.addEventListener('fetch', event => {
 			.then(res_1 => res_1 ? res_1 : fetch(event.request)
 				.then(res_2 => caches.open(CACHE_DYNAMIC_NAME)
 					.then(cache => {
-						cache.put(event.request.url, res_2.clone());
+						// cache.put(event.request.url, res_2.clone());
 						return res_2;
 					})
 				)
