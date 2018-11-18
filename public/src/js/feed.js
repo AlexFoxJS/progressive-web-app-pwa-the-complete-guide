@@ -18,6 +18,16 @@ const sharedMomentsArea = document.querySelector('#shared-moments');
 //
 let networkDataRecived = false;
 
+//
+const keysList = (data) => {
+	let objectKeys = [];
+
+	for (let key in data) {
+		objectKeys.push(data[key])
+	}
+
+	return objectKeys;
+};
 
 //
 openCreatePostModal = () => {
@@ -54,28 +64,28 @@ closeCreatePostModal = () => {
 };
 closeCreatePostModalButton.addEventListener('click', closeCreatePostModal);
 
-// Currently not in use, allows to save a assets in cache on demand otherwise
-onSaveButtonClicked = event => {
-	console.log('onSaveButtonClicked', event);
-
-	if ('caches' in window) {
-		caches.open(CACHE_USER_REQUESTED_NAME)
-			.then(cache => {
-				cache.add(MOCK_URL_GET);
-				cache.add('/src/images/sf-boat.jpg');
-			})
-	}
-};
+// // Currently not in use, allows to save a assets in cache on demand otherwise
+// const onSaveButtonClicked = event => {
+// 	console.log('onSaveButtonClicked', event);
+//
+// 	if ('caches' in window) {
+// 		caches.open(CACHE_USER_REQUESTED_NAME)
+// 			.then(cache => {
+// 				cache.add(MOCK_URL_GET);
+// 				cache.add('/src/images/sf-boat.jpg');
+// 			})
+// 	}
+// };
 
 //
-clearCards = () => {
+const clearCards = () => {
 	while (sharedMomentsArea.hasChildNodes()) {
 		sharedMomentsArea.removeChild(sharedMomentsArea.lastChild);
 	}
 };
 
 //
-createCard = ({image, title, location}) => {
+const createCard = ({image, title, location}) => {
 	const cardWrapper = document.createElement('div');
 	const cardTitle = document.createElement('div');
 	const cardTitleTextElement = document.createElement('h2');
@@ -112,16 +122,7 @@ createCard = ({image, title, location}) => {
 };
 
 //
-formationDataArray = data => {
-	let dataArray = [];
-	for (let key in data) {
-		dataArray.push(data[key])
-	}
-	return dataArray;
-};
-
-//
-updateUI = data => {
+const updateUI = data => {
 	clearCards();
 
 	for (let i = 0; i < data.length; i++) {
@@ -135,7 +136,7 @@ fetch(API_POST_FETCH)
 	.then(data => {
 		console.log('From web:', data);
 		networkDataRecived = true;
-		updateUI(formationDataArray(data));
+		updateUI(keysList(data));
 	})
 
 	.catch(error => {
@@ -153,7 +154,7 @@ if ('caches' in window) {
 		.then(data => {
 			if (!networkDataRecived && data) {
 				console.warn('From cache (feed.js - 1):', data);
-				updateUI(formationDataArray(data));
+				updateUI(keysList(data));
 			}
 		});
 
@@ -165,7 +166,7 @@ if ('caches' in window) {
 		.then(data => {
 			if (!networkDataRecived && data) {
 				console.warn('From cache (feed.js - 2):', data);
-				updateUI(formationDataArray(data));
+				updateUI(keysList(data));
 			}
 		});
 
@@ -177,7 +178,7 @@ if ('caches' in window) {
 		.then(data => {
 			if (!networkDataRecived && data) {
 				console.warn('From cache (feed.js - 3):', data);
-				updateUI(formationDataArray(data));
+				updateUI(keysList(data));
 			}
 		});
 }

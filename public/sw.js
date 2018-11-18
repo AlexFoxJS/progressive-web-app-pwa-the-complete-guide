@@ -1,3 +1,6 @@
+importScripts('/src/js/idb.js');
+
+//
 const CACHE_STATIC_NAME = 'static-v1';
 const CACHE_DYNAMIC_NAME = 'dynamic-v1';
 const CACHE_STATIC_FILES_LIST = [
@@ -6,6 +9,7 @@ const CACHE_STATIC_FILES_LIST = [
 	'/offline.html',
 	'/src/js/app.js',
 	'/src/js/feed.js',
+	'/src/js/idb.js',
 	'/src/js/polyfill/promise.js',
 	'/src/js/polyfill/fetch.js',
 	'/src/js/material.min.js',
@@ -17,6 +21,12 @@ const CACHE_STATIC_FILES_LIST = [
 	'https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.indigo-pink.min.css'
 ];
 
+const dbPromise = idb.open('posts-store', 1, db => {
+	if (!db.objectStoreNames.contains('posts')) {
+		db.createObjectStore('posts', {keyPath: 'id'});
+	}
+});
+
 //
 const MOCK_URL_GET_HTTPBIN = 'https://httpbin.org/get';
 //
@@ -24,7 +34,7 @@ const API_POSTS_FETCH = 'https://pwagram-c7974.firebaseio.com/posts.json';
 
 
 //
-trimCache = (cacheName, maxItems) => {
+const trimCache = (cacheName, maxItems) => {
 	caches.open(cacheName)
 		.then(cache => {
 			return cache.keys()
@@ -35,6 +45,16 @@ trimCache = (cacheName, maxItems) => {
 					}
 				});
 		})
+};
+
+//
+const isInArray = (string, array) => {
+	let cachePath;
+
+	if (string.indexOf(self.origin) === 0) cachePath = string.substring(self.origin.length);
+	else cachePath = string;
+
+	return array.indexOf(cachePath) > -1;
 };
 
 self.addEventListener('install', event => {
@@ -115,66 +135,32 @@ self.addEventListener('activate', event => {
 // });
 
 
-isInArray = (string, array) => {
-	let cachePath;
-
-	if (string.indexOf(self.origin) === 0) cachePath = string.substring(self.origin.length);
-	else cachePath = string;
-
-	return array.indexOf(cachePath) > -1;
-};
-
 // 75 Cache then Network  Dynamic Caching
 self.addEventListener('fetch', event => {
-	// TODO: Разобраться почему не работает
-	// START
-	// if (event.request.url.indexOf(API_POSTS_FETCH) > -1) {
-	// 	event.respondWith(
-	// 		caches.open(CACHE_DYNAMIC_NAME)
-	// 			.then(cache => fetch(event.request)
-	// 				.then(res => {
-	// 					cache.put(event.request, res.clone());
-	// 					return res
-	// 				})
-	// 			)
-	// 	)
-	// } else if (new RegExp('\\b' + CACHE_STATIC_FILES_LIST.join('\\b|\\b') + '\\b').test(event.request.url)) {
-	// 	event.respondWith(
-	// 		caches.match(event.request)
-	// 	)
-	// } else {
-	// 	event.respondWith(
-	// 		caches.match(event.request)
-	// 			.then(res_1 => res_1 ? res_1 : fetch(event.request)
-	// 				.then(res_2 => caches.open(CACHE_DYNAMIC_NAME)
-	// 					.then(cache => {
-	// 						cache.put(event.request.url, res_2.clone());
-	// 						return res_2;
-	// 					})
-	// 				)
-	// 				.catch(err => caches.open(CACHE_STATIC_NAME)
-	// 					.then(cache => event.request.url.indexOf('/help') && cache.match('/offline.html'))
-	// 				)
-	// 			)
-	// 	)
-	// }
-	// END
-
 	if (event.request.url.indexOf(API_POSTS_FETCH) > -1) {
-		event.respondWith(
-			caches.open(CACHE_DYNAMIC_NAME)
-				.then(cache => {
-					fetch(event.request)
-						.then(res => {
-							// trimCache(CACHE_DYNAMIC_NAME, 3);
-							cache.put(event.request, res.clone());
-							return res;
-						})
-						.catch(error => {
-							console.warn('FETCH ERROR (sw.js - 2):', error);
-						})
-				})
-		);
+		event.respondWith(event.request)
+			.then(res => {
+				const cloneRes = res.clone();
+
+				cloneRes.json()
+					.then(data => {
+
+						for (let key of data) {
+							dbPromise
+								.then(db => {
+									const tx = db.transaction('posts', 'readwrite');
+									const store = tx.objectStore('posts');
+
+									store.put(data[key]);
+
+									return tx.complete;
+								})
+						}
+
+					});
+
+				return res;
+			});
 	} else if (isInArray(event.request.url, CACHE_STATIC_FILES_LIST)) {
 		event.respondWith(
 			caches.match(event.request)
@@ -186,7 +172,6 @@ self.addEventListener('fetch', event => {
 					.then(res_2 => caches.open(CACHE_DYNAMIC_NAME)
 						.then(cache => {
 							// trimCache(CACHE_DYNAMIC_NAME, 3);
-
 							cache.put(event.request.url, res_2.clone());
 							return res_2;
 						})
@@ -205,5 +190,6 @@ self.addEventListener('fetch', event => {
 				)
 		);
 	}
-});
+})
+;
 // Different's CACHE strategy END
