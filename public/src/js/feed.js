@@ -19,7 +19,7 @@ const sharedMomentsArea = document.querySelector('#shared-moments');
 let networkDataRecived = false;
 
 //
-const keysList = (data) => {
+const keysList = data => {
 	let objectKeys = [];
 
 	for (let key in data) {
@@ -134,51 +134,60 @@ const updateUI = data => {
 fetch(API_POST_FETCH)
 	.then(res => res.json())
 	.then(data => {
-		console.log('From web:', data);
+		console.log('From web (feed.js - 1):', data);
 		networkDataRecived = true;
 		updateUI(keysList(data));
 	})
 
 	.catch(error => {
-		console.warn('FETCH ERROR (feed.js - 1):', error);
+		console.log('FETCH ERROR (feed.js - 1):', error);
 	});
 
 //
-if ('caches' in window) {
+if ('indexedDB' in window) {
 
-	//
-	caches.match(MOCK_URL_GET)
-		.then(res => {
-			if (res) return res.json()
-		})
+	readAllData('posts')
 		.then(data => {
 			if (!networkDataRecived && data) {
-				console.warn('From cache (feed.js - 1):', data);
-				updateUI(keysList(data));
+				console.log('From cache (feed.js - 4):', data);
+				updateUI(data);
 			}
 		});
 
+	// //
+	// caches.match(MOCK_URL_GET)
+	// 	.then(res => {
+	// 		if (res) return res.json()
+	// 	})
+	// 	.then(data => {
+	// 		if (!networkDataRecived && data) {
+	// 			console.log('From cache (feed.js - 1):', data);
+	// 			updateUI(keysList(data));
+	// 		}
+	// 	});
 	//
-	caches.match(API_POST_FETCH)
-		.then(res => {
-			if (res) return res.json()
-		})
-		.then(data => {
-			if (!networkDataRecived && data) {
-				console.warn('From cache (feed.js - 2):', data);
-				updateUI(keysList(data));
-			}
-		});
+	// //
+	// caches.match(API_POST_FETCH)
+	// 	.then(res => {
+	// 		if (res) return res.json()
+	// 	})
+	// 	.then(data => {
+	// 		if (!networkDataRecived && data) {
+	// 			console.log('From cache (feed.js - 2):', data);
+	// 			updateUI(keysList(data));
+	// 		}
+	// 	});
+	//
+	// //
+	// caches.match(API_POST_FETCH_CACHE)
+	// 	.then(res => {
+	// 		if (res) return res.json()
+	// 	})
+	// 	.then(data => {
+	// 		if (!networkDataRecived && data) {
+	// 			console.log('From cache (feed.js - 3):', data);
+	// 			updateUI(keysList(data));
+	// 		}
+	// 	});
 
-	//
-	caches.match(API_POST_FETCH_CACHE)
-		.then(res => {
-			if (res) return res.json()
-		})
-		.then(data => {
-			if (!networkDataRecived && data) {
-				console.warn('From cache (feed.js - 3):', data);
-				updateUI(keysList(data));
-			}
-		});
 }

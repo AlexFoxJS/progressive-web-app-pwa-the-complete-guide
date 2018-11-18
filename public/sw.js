@@ -10,6 +10,7 @@ const CACHE_STATIC_FILES_LIST = [
 	'/src/js/app.js',
 	'/src/js/feed.js',
 	'/src/js/idb.js',
+	'/src/js/utility.js',
 	'/src/js/polyfill/promise.js',
 	'/src/js/polyfill/fetch.js',
 	'/src/js/material.min.js',
@@ -106,7 +107,9 @@ self.addEventListener('fetch', event => {
 				.then(res_1 => res_1 ? res_1 : fetch(event.request)
 					.then(res_2 => caches.open(CACHE_DYNAMIC_NAME)
 						.then(cache => {
-							cache.put(event.request.url, res_2.clone());
+							if (!event.request.url.startsWith('chrome-extension')) {
+								cache.put(event.request.url, res_2.clone());
+							}
 							return res_2;
 						})
 					)
