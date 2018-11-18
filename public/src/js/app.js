@@ -1,27 +1,24 @@
-//
+
+var deferredPrompt;
+
 if (!window.Promise) {
-	window.Promise = Promise
+  window.Promise = Promise;
 }
 
-//
 if ('serviceWorker' in navigator) {
-	navigator.serviceWorker
-		.register('/sw.js')
-		.then(() => {
-			console.log('Service Worker registered!')
-		})
-		.catch(err => {
-			console.log(err)
-		})
+  navigator.serviceWorker
+    .register('/sw.js')
+    .then(function () {
+      console.log('Service worker registered!');
+    })
+    .catch(function(err) {
+      console.log(err);
+    });
 }
 
-//
-let deferentPrompt;
-window.addEventListener('beforeinstallprompt', event => {
-	console.log('beforeinstallprompt fired');
-
-	event.preventDefault();
-	deferentPrompt = event;
-
-	return false;
+window.addEventListener('beforeinstallprompt', function(event) {
+  console.log('beforeinstallprompt fired');
+  event.preventDefault();
+  deferredPrompt = event;
+  return false;
 });
