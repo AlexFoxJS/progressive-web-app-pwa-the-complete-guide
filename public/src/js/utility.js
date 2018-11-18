@@ -4,10 +4,10 @@ const dbPromise = idb.open('posts-store', 1, db => {
 	}
 });
 
-const writeData = (store, data) => dbPromise
+const writeData = (st, data) => dbPromise
 	.then(db => {
-		const tx = db.transaction(store, 'readwrite');
-		const store = tx.objectStore(store);
+		const tx = db.transaction(st, 'readwrite');
+		const store = tx.objectStore(st);
 
 		store.put(data);
 
