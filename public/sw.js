@@ -138,14 +138,15 @@ self.addEventListener('activate', event => {
 // 75 Cache then Network  Dynamic Caching
 self.addEventListener('fetch', event => {
 	if (event.request.url.indexOf(API_POSTS_FETCH) > -1) {
-		event.respondWith(event.request)
+
+		event.respondWith(fetch(event.request)
 			.then(res => {
 				const cloneRes = res.clone();
 
 				cloneRes.json()
 					.then(data => {
 
-						for (let key of data) {
+						for (let key in data) {
 							dbPromise
 								.then(db => {
 									const tx = db.transaction('posts', 'readwrite');
@@ -160,7 +161,9 @@ self.addEventListener('fetch', event => {
 					});
 
 				return res;
-			});
+			})
+		);
+
 	} else if (isInArray(event.request.url, CACHE_STATIC_FILES_LIST)) {
 		event.respondWith(
 			caches.match(event.request)
