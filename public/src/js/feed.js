@@ -1,9 +1,13 @@
 //
-const CAHCE_USER_REQUESTED_NAME = 'user-requested';
+const CACHE_USER_REQUESTED_NAME = 'user-requested';
 
 //
 const MOCK_URL_GET = 'https://httpbin.org/get';
 const MOCK_URL_POST = 'https://httpbin.org/post';
+
+// Real API Url's
+const API_POST_FETCH = "https://pwagram-c7974.firebaseio.com/posts.json";
+const API_POST_FETCH_CACHE = "/posts.json";
 
 //
 const shareImageButton = document.querySelector('#share-image-button');
@@ -26,12 +30,8 @@ openCreatePostModal = () => {
 		deferentPrompt.userChoice.then(choiceResult => {
 			console.log(choiceResult.outcome);
 
-			if (choiceResult.outcome === 'dismissed') {
-				console.log('User canceled instalation');
-			} else {
-				console.log('User added to home screen');
-			}
-
+			if (choiceResult.outcome === 'dismissed') console.log('User canceled instalation');
+			else console.log('User added to home screen');
 		});
 
 		deferentPrompt = null;
@@ -59,7 +59,7 @@ onSaveButtonClicked = event => {
 	console.log('onSaveButtonClicked', event);
 
 	if ('caches' in window) {
-		caches.open(CAHCE_USER_REQUESTED_NAME)
+		caches.open(CACHE_USER_REQUESTED_NAME)
 			.then(cache => {
 				cache.add(MOCK_URL_GET);
 				cache.add('/src/images/sf-boat.jpg');
@@ -67,6 +67,7 @@ onSaveButtonClicked = event => {
 	}
 };
 
+//
 clearCards = () => {
 	while (sharedMomentsArea.hasChildNodes()) {
 		sharedMomentsArea.removeChild(sharedMomentsArea.lastChild);
@@ -74,7 +75,7 @@ clearCards = () => {
 };
 
 //
-createCard = () => {
+createCard = ({image, title, location}) => {
 	const cardWrapper = document.createElement('div');
 	const cardTitle = document.createElement('div');
 	const cardTitleTextElement = document.createElement('h2');
@@ -83,18 +84,18 @@ createCard = () => {
 	cardWrapper.className = 'shared-moment-card mdl-card mdl-shadow--2dp mdl-cell';
 
 	cardTitle.className = 'mdl-card__title';
-	cardTitle.style.backgroundImage = 'url("/src/images/sf-boat.jpg")';
+	cardTitle.style.backgroundImage = `url(${image})`;
 	cardTitle.style.backgroundSize = 'cover';
 	cardTitle.style.height = '180px';
 	cardWrapper.appendChild(cardTitle);
 
 	cardTitleTextElement.className = 'mdl-card__title-text';
-	cardTitleTextElement.textContent = 'San Francisco Trip';
+	cardTitleTextElement.textContent = title;
 	cardTitleTextElement.style.color = 'white';
 	cardTitle.appendChild(cardTitleTextElement);
 
 	cardSupportingText.className = 'mdl-card__supporting-text';
-	cardSupportingText.textContent = 'In San Francisco';
+	cardSupportingText.textContent = location;
 	cardSupportingText.style.textAlign = 'center';
 
 	// 68 Offering Cache on Demand
@@ -111,37 +112,72 @@ createCard = () => {
 };
 
 //
-fetch(MOCK_URL_POST, {
-	method: 'POST',
-	headers: {
-		'Content-Type': 'application/json',
-		'Accept': 'application/json',
-	},
-	body: JSON.stringify({
-		message: 'POST API - Mock data'
-	})
-})
+formationDataArray = data => {
+	let dataArray = [];
+	for (let key in data) {
+		dataArray.push(data[key])
+	}
+	return dataArray;
+};
+
+//
+updateUI = data => {
+	clearCards();
+
+	for (let i = 0; i < data.length; i++) {
+		createCard(data[i]);
+	}
+};
+
+//
+fetch(API_POST_FETCH)
 	.then(res => res.json())
 	.then(data => {
 		console.log('From web:', data);
-
 		networkDataRecived = true;
-		clearCards();
-		createCard();
+		updateUI(formationDataArray(data));
+	})
+
+	.catch(error => {
+		console.warn('FETCH ERROR (feed.js - 1):', error);
 	});
 
 //
 if ('caches' in window) {
+
+	//
 	caches.match(MOCK_URL_GET)
 		.then(res => {
 			if (res) return res.json()
 		})
 		.then(data => {
-			console.log('From cache:', data);
-
-			if (!networkDataRecived) {
-				clearCards();
-				createCard();
+			if (!networkDataRecived && data) {
+				console.warn('From cache (feed.js - 1):', data);
+				updateUI(formationDataArray(data));
 			}
+		});
+
+	//
+	caches.match(API_POST_FETCH)
+		.then(res => {
+			if (res) return res.json()
 		})
+		.then(data => {
+			if (!networkDataRecived && data) {
+				console.warn('From cache (feed.js - 2):', data);
+				updateUI(formationDataArray(data));
+			}
+		});
+
+	//
+	caches.match(API_POST_FETCH_CACHE)
+		.then(res => {
+			if (res) return res.json()
+		})
+		.then(data => {
+			if (!networkDataRecived && data) {
+				console.warn('From cache (feed.js - 3):', data);
+				updateUI(formationDataArray(data));
+			}
+		});
 }
