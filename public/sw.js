@@ -1,7 +1,6 @@
 importScripts('/src/js/idb.js');
 importScripts('/src/js/utility.js');
 
-//
 const CACHE_STATIC_NAME = 'static-v1';
 const CACHE_DYNAMIC_NAME = 'dynamic-v1';
 const CACHE_STATIC_FILES_LIST = [
@@ -21,14 +20,9 @@ const CACHE_STATIC_FILES_LIST = [
 	'https://fonts.googleapis.com/icon?family=Material+Icons',
 	'https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.indigo-pink.min.css'
 ];
-
-//
-const MOCK_URL_GET_HTTPBIN = 'https://httpbin.org/get';
-//
 const API_POSTS_FETCH = 'https://pwagram-c7974.firebaseio.com/posts.json';
 
 
-//
 const trimCache = (cacheName, maxItems) => {
 	caches.open(cacheName)
 		.then(cache => {
@@ -42,7 +36,6 @@ const trimCache = (cacheName, maxItems) => {
 		})
 };
 
-//
 const isInArray = (string, array) => {
 	let cachePath;
 
@@ -83,54 +76,6 @@ self.addEventListener('activate', event => {
 	return self.clients.claim();
 });
 
-// Different's CACHE strategy START
-// 70 Strategy Cache with Network Fallback
-// self.addEventListener('fetch', event => {
-// 	event.respondWith(
-// 		caches.match(event.request)
-// 			.then(res_1 => res_1 ? res_1 : fetch(event.request)
-// 				.then(res_2 => caches.open(CACHE_DYNAMIC_NAME)
-// 					.then(cache => {
-// 						cache.put(event.request.url, res_2.clone());
-// 						return res_2;
-// 					})
-// 				)
-// 				.catch(err => caches.open(CACHE_STATIC_NAME)
-// 					.then(cache => cache.match('/offline.html'))
-// 				)
-// 			)
-// 	)
-// });
-
-// 71 Strategy Cache Only
-// self.addEventListener('fetch', event => {
-// 	event.respondWith(
-// 		caches.match(event.request)
-// 	)
-// });
-
-// 72 Strategy Network Only
-// self.addEventListener('fetch', event => {
-// 	event.respondWith(
-// 		fetch(event.request)
-// 	)
-// });
-
-// 73 Strategy Network with Cache Fallback
-// self.addEventListener('fetch', event => {
-// 	event.respondWith(
-// 		fetch(event.request)
-// 			.then(res => caches.open(CACHE_DYNAMIC_NAME)
-// 				.then(cache => {
-// 					cache.put(event.request.url, res.clone());
-// 					return res;
-// 				}))
-// 			.catch(err => caches.match(event.request))
-// 	)
-// });
-
-
-// 75 Cache then Network  Dynamic Caching
 self.addEventListener('fetch', event => {
 	if (event.request.url.indexOf(API_POSTS_FETCH) > -1) {
 
@@ -161,7 +106,6 @@ self.addEventListener('fetch', event => {
 				.then(res_1 => res_1 ? res_1 : fetch(event.request)
 					.then(res_2 => caches.open(CACHE_DYNAMIC_NAME)
 						.then(cache => {
-							// trimCache(CACHE_DYNAMIC_NAME, 3);
 							cache.put(event.request.url, res_2.clone());
 							return res_2;
 						})
