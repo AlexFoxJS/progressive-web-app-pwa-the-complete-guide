@@ -97,7 +97,9 @@ const url = 'https://pwagram-c7974.firebaseio.com/posts.json';
 let networkDataReceived = false;
 
 fetch(url)
-  .then(res => res.json())
+  .then(res => {
+    return res.json()
+  })
   .then(data => {
     networkDataReceived = true;
     console.log('From web', data);
