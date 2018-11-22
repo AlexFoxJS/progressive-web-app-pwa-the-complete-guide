@@ -1,21 +1,19 @@
-var shareImageButton = document.querySelector('#share-image-button');
-var createPostArea = document.querySelector('#create-post');
-var closeCreatePostModalButton = document.querySelector('#close-create-post-modal-btn');
-var sharedMomentsArea = document.querySelector('#shared-moments');
+const shareImageButton = document.querySelector('#share-image-button');
+const createPostArea = document.querySelector('#create-post');
+const closeCreatePostModalButton = document.querySelector('#close-create-post-modal-btn');
+const sharedMomentsArea = document.querySelector('#shared-moments');
 
-function openCreatePostModal() {
+const openCreatePostModal = () => {
   createPostArea.style.display = 'block';
+
   if (deferredPrompt) {
     deferredPrompt.prompt();
 
-    deferredPrompt.userChoice.then(function(choiceResult) {
+    deferredPrompt.userChoice.then(choiceResult => {
       console.log(choiceResult.outcome);
 
-      if (choiceResult.outcome === 'dismissed') {
-        console.log('User cancelled installation');
-      } else {
-        console.log('User added to home screen');
-      }
+      if (choiceResult.outcome === 'dismissed') console.log('User cancelled installation');
+      else console.log('User added to home screen');
     });
 
     deferredPrompt = null;
@@ -29,88 +27,94 @@ function openCreatePostModal() {
   //       }
   //     })
   // }
-}
+};
 
-function closeCreatePostModal() {
+const closeCreatePostModal = () => {
   createPostArea.style.display = 'none';
-}
+};
 
 shareImageButton.addEventListener('click', openCreatePostModal);
 
 closeCreatePostModalButton.addEventListener('click', closeCreatePostModal);
 
 // Currently not in use, allows to save assets in cache on demand otherwise
-function onSaveButtonClicked(event) {
+const onSaveButtonClicked = event => {
   console.log('clicked');
+
   if ('caches' in window) {
     caches.open('user-requested')
-      .then(function(cache) {
+      .then(cache => {
         cache.add('https://httpbin.org/get');
         cache.add('/src/images/sf-boat.jpg');
       });
   }
-}
+};
 
-function clearCards() {
+const clearCards = () => {
   while(sharedMomentsArea.hasChildNodes()) {
     sharedMomentsArea.removeChild(sharedMomentsArea.lastChild);
   }
-}
+};
 
-function createCard(data) {
-  var cardWrapper = document.createElement('div');
+const createCard = data => {
+  const cardWrapper = document.createElement('div');
   cardWrapper.className = 'shared-moment-card mdl-card mdl-shadow--2dp';
-  var cardTitle = document.createElement('div');
+
+  const cardTitle = document.createElement('div');
   cardTitle.className = 'mdl-card__title';
   cardTitle.style.backgroundImage = 'url(' + data.image + ')';
   cardTitle.style.backgroundSize = 'cover';
   cardTitle.style.height = '180px';
   cardWrapper.appendChild(cardTitle);
-  var cardTitleTextElement = document.createElement('h2');
+
+  const cardTitleTextElement = document.createElement('h2');
   cardTitleTextElement.style.color = 'white';
   cardTitleTextElement.className = 'mdl-card__title-text';
   cardTitleTextElement.textContent = data.title;
   cardTitle.appendChild(cardTitleTextElement);
-  var cardSupportingText = document.createElement('div');
+
+  const cardSupportingText = document.createElement('div');
   cardSupportingText.className = 'mdl-card__supporting-text';
   cardSupportingText.textContent = data.location;
   cardSupportingText.style.textAlign = 'center';
-  // var cardSaveButton = document.createElement('button');
+	cardWrapper.appendChild(cardSupportingText);
+
+  // const cardSaveButton = document.createElement('button');
   // cardSaveButton.textContent = 'Save';
   // cardSaveButton.addEventListener('click', onSaveButtonClicked);
   // cardSupportingText.appendChild(cardSaveButton);
-  cardWrapper.appendChild(cardSupportingText);
+
   componentHandler.upgradeElement(cardWrapper);
   sharedMomentsArea.appendChild(cardWrapper);
-}
+};
 
-function updateUI(data) {
+const updateUI = data => {
   clearCards();
   for (var i = 0; i < data.length; i++) {
     createCard(data[i]);
   }
-}
+};
 
-var url = 'https://pwagram-c7974.firebaseio.com/posts.json';
-var networkDataReceived = false;
+const url = 'https://pwagram-c7974.firebaseio.com/posts.json';
+let networkDataReceived = false;
 
 fetch(url)
-  .then(function(res) {
-    return res.json();
-  })
-  .then(function(data) {
+  .then(res => res.json())
+  .then(data => {
     networkDataReceived = true;
     console.log('From web', data);
-    var dataArray = [];
-    for (var key in data) {
+	  const dataArray = [];
+
+    for (let key in data) {
       dataArray.push(data[key]);
     }
+
     updateUI(dataArray);
   });
 
 if ('indexedDB' in window) {
   readAllData('posts')
-    .then(function(data) {
+    .then(data => {
       if (!networkDataReceived) {
         console.log('From cache', data);
         updateUI(data);
