@@ -138,4 +138,11 @@ form.addEventListener('submit', event => {
   if (titleInput.value.trim() === '' || locationInput.value.trim() === '') return;
 
   closeCreatePostModal();
+
+  if ('serviceWorker' in navigator && 'SyncManager' in window) {
+    navigator.serviceWorker.ready
+      .then(sw => {
+        sw.sync.register('sync-new-post');
+      });
+  }
 });
