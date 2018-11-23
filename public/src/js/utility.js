@@ -1,7 +1,13 @@
 const dbPromise = idb.open('posts-store', 1, db => {
+
 	if (!db.objectStoreNames.contains('posts')) {
 		db.createObjectStore('posts', {keyPath: 'id'});
 	}
+
+	if (!db.objectStoreNames.contains('new-post')) {
+		db.createObjectStore('new-post', {keyPath: 'id'});
+	}
+
 });
 
 const writeData = (st, data) => dbPromise

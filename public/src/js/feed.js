@@ -142,7 +142,24 @@ form.addEventListener('submit', event => {
   if ('serviceWorker' in navigator && 'SyncManager' in window) {
     navigator.serviceWorker.ready
       .then(sw => {
-        sw.sync.register('sync-new-post');
+	      const newPostData = {
+	        id: new Date().toISOString(),
+          title: titleInput.value,
+          location: locationInput.value,
+        };
+
+	      writeData('new-post', newPostData)
+          .then(() => sw.sync.register('sync-new-post'))
+          .then(() => {
+            const snackbarContainer = document.querySelector('#confirmation-toast');
+            const data = { message: 'Your post was saved in local sync data!' };
+
+	          snackbarContainer.MaterialSnackbar.showSnackbar(data);
+          })
+          .catch(error => {
+	          console.error('Save post to indexedDB.', error);
+          })
+
       });
   }
 });
