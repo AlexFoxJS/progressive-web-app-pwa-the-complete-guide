@@ -133,7 +133,7 @@ if ('indexedDB' in window) {
 }
 
 const sendData = () => {
-  fetch('https://us-central1-pwagram-c7974.cloudfunctions.net/storePostData.json', {
+  fetch('https://us-central1-pwagram-c7974.cloudfunctions.net/storePostData', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
