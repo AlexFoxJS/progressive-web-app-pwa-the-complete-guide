@@ -133,7 +133,7 @@ if ('indexedDB' in window) {
 }
 
 const sendData = () => {
-  fetch(FIREBASE_TABLE_POSTS_URL, {
+  fetch('https://us-central1-pwagram-c7974.cloudfunctions.net/storePostData', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -179,9 +179,6 @@ form.addEventListener('submit', event => {
           .catch(error => console.error('Save post to indexedDB.', error))
 
       });
-  } else {
-	  sendData();
-  }
-
+  } else sendData();
 
 });

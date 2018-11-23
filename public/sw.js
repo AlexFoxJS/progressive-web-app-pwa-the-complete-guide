@@ -189,7 +189,7 @@ self.addEventListener('sync', event => {
 		  readAllData('sync-posts')
         .then(data => {
           for (let {id, title, location} of data) {
-	          fetch('https://pwagram-c7974.firebaseio.com/posts.json', {
+	          fetch('https://us-central1-pwagram-c7974.cloudfunctions.net/storePostData', {
 		          method: 'POST',
 		          headers: {
 			          'Content-Type': 'application/json',
@@ -206,7 +206,9 @@ self.addEventListener('sync', event => {
 			          console.log('Send date', res);
 
 			          if (res.ok) {
-			            deletePost('sync-posts', id)
+			          	res.json().then(resData => {
+					          deletePost('sync-posts', resData.id)
+				          })
 			          }
 		          })
               .catch(error => console.log('Error wile sending data', error))
