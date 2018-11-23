@@ -166,19 +166,17 @@ form.addEventListener('submit', event => {
 	        id: new Date().toISOString(),
           title: titleInput.value,
           location: locationInput.value,
+		      image: 'https://firebasestorage.googleapis.com/v0/b/pwagram-c7974.appspot.com/o/test_image.jpeg?alt=media&token=5215771c-be55-4e2c-9525-b63bd3bdec6d',
         };
 
-	      writeData('new-post', newPostData)
+	      writeData('sync-posts', newPostData)
           .then(() => sw.sync.register('sync-new-post'))
           .then(() => {
             const snackbarContainer = document.querySelector('#confirmation-toast');
             const data = { message: 'Your post was saved in local sync data!' };
-
 	          snackbarContainer.MaterialSnackbar.showSnackbar(data);
           })
-          .catch(error => {
-	          console.error('Save post to indexedDB.', error);
-          })
+          .catch(error => console.error('Save post to indexedDB.', error))
 
       });
   } else {

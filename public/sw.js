@@ -178,3 +178,41 @@ self.addEventListener('fetch', event => {
 //     fetch(event.request)
 //   );
 // });
+
+self.addEventListener('sync', event => {
+	console.log('[Service Worker] Background syncing', event);
+
+	if (event.tag === 'sync-new-post') {
+		console.log('[Service Worker] Syncing new Posts');
+
+		event.waitUntil(
+		  readAllData('sync-posts')
+        .then(data => {
+          for (let {id, title, location} of data) {
+	          fetch('https://pwagram-c7974.firebaseio.com/posts.json', {
+		          method: 'POST',
+		          headers: {
+			          'Content-Type': 'application/json',
+			          'Accept': 'application/json',
+		          },
+		          body: JSON.stringify({
+			          id,
+			          title,
+			          location,
+			          image: 'https://firebasestorage.googleapis.com/v0/b/pwagram-c7974.appspot.com/o/test_image.jpeg?alt=media&token=5215771c-be55-4e2c-9525-b63bd3bdec6d'
+		          })
+	          })
+		          .then(res => {
+			          console.log('Send date', res);
+
+			          if (res.ok) {
+			            deletePost('sync-posts', id)
+			          }
+		          })
+              .catch(error => console.log('Error wile sending data', error))
+          }
+        })
+    )
+  }
+
+});
