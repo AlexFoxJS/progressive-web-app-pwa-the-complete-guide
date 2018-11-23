@@ -6,6 +6,9 @@ const form = document.querySelector('form');
 const titleInput = document.querySelector('#title');
 const locationInput = document.querySelector('#location');
 
+const FIREBASE_TABLE_POSTS_URL = 'https://pwagram-c7974.firebaseio.com/posts.json';
+let networkDataReceived = false;
+
 const openCreatePostModal = () => {
   createPostArea.style.display = 'block';
 
@@ -103,10 +106,7 @@ const updateUI = data => {
   }
 };
 
-const url = 'https://pwagram-c7974.firebaseio.com/posts.json';
-let networkDataReceived = false;
-
-fetch(url)
+fetch(FIREBASE_TABLE_POSTS_URL)
   .then(res => {
     return res.json()
   })
@@ -131,6 +131,26 @@ if ('indexedDB' in window) {
       }
     });
 }
+
+const sendData = () => {
+  fetch(FIREBASE_TABLE_POSTS_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+    body: JSON.stringify({
+      id: new Date().toISOString(),
+	    title: titleInput.value,
+	    location: locationInput.value,
+      image: 'https://firebasestorage.googleapis.com/v0/b/pwagram-c7974.appspot.com/o/test_image.jpeg?alt=media&token=5215771c-be55-4e2c-9525-b63bd3bdec6d'
+    }),
+  })
+    .then(res => {
+	    console.log('Send date', res);
+      updateUI();
+    })
+};
 
 form.addEventListener('submit', event => {
   event.preventDefault();
@@ -161,5 +181,9 @@ form.addEventListener('submit', event => {
           })
 
       });
+  } else {
+	  sendData();
   }
+
+
 });
